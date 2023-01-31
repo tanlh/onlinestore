@@ -1,0 +1,26 @@
+server:
+  port: ${PORT:8010}
+#  error:
+#    include-message: always
+#    include-binding-errors: always
+#    include-stacktrace: never
+
+spring:
+  application:
+    name: product-service
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+  datasource:
+    url: jdbc:mysql://localhost:3306/product-service
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: load-from-config-server
+    password: load-from-config-server
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+axon:
+  eventhandling:
+    processors:
+      product:
+        mode: subscribing

@@ -1,0 +1,22 @@
+server:
+  port: ${PORT:8030}
+
+spring:
+  application:
+    name: payment-service
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+  datasource:
+    url: jdbc:mysql://localhost:3306/payment-service
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: load-from-config-server
+    password: load-from-config-server
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+axon:
+  eventhandling:
+    processors:
+      payment:
+        mode: subscribing

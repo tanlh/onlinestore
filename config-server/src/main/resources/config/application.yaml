@@ -1,0 +1,36 @@
+spring:
+  jpa:
+    open-in-view: false
+
+token:
+  signingKey: '{cipher}AQCbKL8ZUsLXjbb6MQ+9ESO08DfYv+QTKB+kgGWNbLyiUrwjk6EYcRkqS7S65jF7qjil3LnODjUB/bxqBa+gMZItny/S14KWmRCzbXVh8YU+qIAJ705RCUJMeLfBaRR34quAJe34vlzRbZszOGiFl8hT8ImamSI4CilFzTYb9hQDXvQbd5RtT4UTQCNMqMkUFwVsRiv8GAMy/sgCSm0vcK4thhKqyrJ/BjShVBwIiK6R/GgxPwixF1Y7Y50eOaVYKcrmUStSQE0GHaZWh9ZOA+h9G94rxOfRI0mMZELW72c3CAd86wVVcC35QoOla8PFIDJK3QBYF3Dbk3IUGbu1txOP4uvAwYPHBq/GCM1nVjAK85t/1iWrDI9lbWd1j79qu3JEL9ENJEj+/bgrmNnMPjgXTUDDyFWNEEmk2kaJtevWP/VHqTDWZn+TrU7MN8sPDH4='
+
+config:
+  eureka:
+    username: '{cipher}AQBFC6e4J5a3LY1QNXXNWHVg5x2jePOSPNJoOOKJgMtp1RIosakoSFe+GBBOMgBg9sz2OLrBTvcsNT37J+Uz4idsjglrKfAr6JBW+DHLfFP3pBQRBNmswtfc8oSp2+UkAlLkESbRSUYNwQXMVlfp8cD+fWeKu6hhfbPWnRT+uWFFi6tDtSPWEKKyLxLRy800tBh0iJH7SaOlQODDhKYe42VOLWZaLyUCRxVbbON8S5P//pdZhJT21Ol1QW63qe3TbmtWLRt9/VnW9TnuorgzF7LBxoc74G/ZgH8nagHUfYCi2js867DiN4d0cdAIdkLO2w8UqeBvMRF2sL0mxUIdrNuDzMzZGDDVE+frWi2YipthGyCSX9Y1R7lMja5ggs8dmZc='
+    password: '{cipher}AQBkHFW0rNT3JGN/W7AbhpRf3FIz4wkl7UQFSH5OF7IDtJC7026iphoI8olmDPWyKYFS+DG1EbAfjX5VFZGShGmmIl9hi66ghcPgjK0JM4vZgvDHzPbIH2/3SIvjHaQK5kxFjv9T/sa8EIaq7pgiw8vDWKOE00pOQV5TZVnnj/hmaqPdQVftzbe3zaQxbUhepF2F0gC8VVfMbx1F5VL5TwsG2yHdRh+WQe3H8FrnTATQfJCKBvQYGlRhApXJ2DY3V+cElOfjeNZX0ZHAemfGni0IWXzAuTbDfWp4OXH9cL8a2zzIZXHd5weHfDgZQmK/cREHG77DRvwp5wYuTfSgVCyr94RGoKlvaH3v0bwDGS7UOuIBBqSae9HzvKd1uAzH5wE='
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${config.eureka.username}:${config.eureka.password}@localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.instance-id:${random.value}}
+    prefer-ip-address: true
+    status-page-url-path: /actuator/health
+
+feign:
+  client:
+    config:
+      default:
+        logger-level: FULL
+
+#
+#logging:
+#  file:
+#    name: application.log
+
+axon:
+  serializer:
+    events: jackson
+    messages: jackson

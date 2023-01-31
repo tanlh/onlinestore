@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.onlinestore.shared.config.CommonAxonConfig,\
+com.onlinestore.shared.errorhandling.GenericControllerAdvice

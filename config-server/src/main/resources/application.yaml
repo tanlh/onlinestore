@@ -1,0 +1,25 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+#        git:
+#          uri: https://github.com/TanPhotoApp/configuration
+#          username: tanlh
+#          password:
+#          clone-on-start: true
+#          default-label: main
+        native:
+          search-locations: "[classpath:/, classpath:/config, classpath:/config/{application}, classpath:/config/{application}/{profile}]"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: busrefresh

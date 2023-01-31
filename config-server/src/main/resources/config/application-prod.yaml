@@ -1,0 +1,9 @@
+feign:
+  client:
+    config:
+      default:
+        logger-level: BASIC
+
+logging:
+  file:
+    name: application.log

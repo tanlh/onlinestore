@@ -1,0 +1,8 @@
+#encrypt:
+#  key: 9mlnaslkjzv823jkasdiofahjs91aslfasjf1j
+
+encrypt:
+  key-store:
+    location: apikey.jks
+    alias: apikey
+    password: test123456
