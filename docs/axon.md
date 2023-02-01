@@ -55,6 +55,69 @@ public class OrderSaga {
 ## Set based consistency validation
 Read: [Set based consistency validation](https://developer.axoniq.io/w/set-based-consistency-validation)
 
+## Exception handler
+We can create an exception handler method to capture exceptions thrown by all event handler methods inside one class by using 
+annotation `org.axonframework.messaging.interceptors.ExceptionHandler` (same to `@ExceptionHandler` in `@ControllerAdvice` of Spring).
+There can be multiple exception handler methods. Here is the code snippet:
+```java
+@Component
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true)
+@ProcessingGroup("product")
+@Slf4j
+public class ProductEventHandler {
+
+    ProductRepository productRepository;
+    ProductMapper mapper;
+
+    @EventHandler
+    public void on(ProductCreatedEvent event) {
+        productRepository.save(mapper.toProductEntity(event));
+    }
+
+    @EventHandler
+    public void on(ProductReservedEvent event) {
+        productRepository.deductQuantity(event.productId(), event.quantity());
+    }
+
+    @EventHandler
+    public void on(ProductReservationCancelledEvent event) {
+        productRepository.increaseQuantity(event.productId(), event.quantity());
+    }
+
+    @ExceptionHandler(resultType = PersistenceException.class)
+    public void handle(PersistenceException ex) {
+        log.error("Error while performing data change to database", ex);
+        throw ex;
+    }
+
+    @ExceptionHandler
+    public void handle(Exception ex) throws Exception {
+        log.error("Other error happens", ex);
+        throw ex;
+    }
+
+}
+```
+
+**Note:**
+- If we don't rethrow exception inside exception handler method, axon will not know exception happened. And we must handle rollback transaction yourself.
+- Rethrow exception is not enough to let axon rollback transaction. We have to register `PropagatingErrorHandler` as `ListenerInvocationErrorHandler`.
+```java
+@Configuration
+public class CommonAxonConfig {
+    
+    @Autowired
+    public void configure(EventProcessingConfigurer configurer) {
+        // register for all processes
+        configurer.registerDefaultListenerInvocationErrorHandler(conf -> PropagatingErrorHandler.instance())
+            // register for product process group only
+            .registerListenerInvocationErrorHandler("product", conf -> PropagatingErrorHandler.instance());
+    }
+    
+}
+```
+
 ## Common errors
 ### Google guava conflicts
 We might get errors related to Google guava conflicts when starting application.
