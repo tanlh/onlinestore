@@ -19,8 +19,8 @@ axon:
   eventhandling:
     processors:
       product:
-        mode: tracking # set to tracking to replay events
-#        mode: subscribing
+#        mode: tracking # set to tracking to replay events
+        mode: subscribing
 
 logging:
   level:
