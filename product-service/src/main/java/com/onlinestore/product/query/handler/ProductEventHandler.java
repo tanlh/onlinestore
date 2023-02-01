@@ -31,15 +31,6 @@ public class ProductEventHandler {
     @EventHandler
     public void on(ProductCreatedEvent event) {
         productRepository.save(mapper.toProductEntity(event));
-
-//        var random = new Random();
-//        if (random.nextBoolean()) {
-//            if (random.nextBoolean()) {
-//                throw new IllegalStateException("Product event handler illegal error");
-//            }
-//
-//            throw new RuntimeException("Product event handler runtime error");
-//        }
     }
 
     @EventHandler

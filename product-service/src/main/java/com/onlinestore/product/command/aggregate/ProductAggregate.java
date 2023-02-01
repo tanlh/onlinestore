@@ -35,18 +35,13 @@ public class ProductAggregate {
     @CommandHandler
     public ProductAggregate(CreateProductCommand command, ProductMapper mapper) {
         AggregateLifecycle.apply(mapper.toProductCreatedEvent(command));
-
-//        if (new Random().nextBoolean()) {
-//            // This error will be wrapped by CommandExecutionException
-//            throw new RuntimeException("Order aggregate throw error");
-//        }
     }
 
     @CommandHandler
     public void handle(ReserveProductCommand command, ProductMapper mapper) {
         log.info("Handle ReserveProductCommand: {}", command);
         if (quantity < command.quantity()) {
-            throw new ValidationException("Product %s is out of stock".formatted(productId));
+            throw new ValidationException("Insufficient number in stock");
         }
 
         AggregateLifecycle.apply(mapper.toProduceReservedEvent(command));
