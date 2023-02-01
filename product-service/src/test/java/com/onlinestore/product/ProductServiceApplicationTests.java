@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import testing.OnlineStoreTest;
 
 @OnlineStoreTest
-class ProductApplicationTests {
+class ProductServiceApplicationTests {
 
     @Test
     void contextLoads() {

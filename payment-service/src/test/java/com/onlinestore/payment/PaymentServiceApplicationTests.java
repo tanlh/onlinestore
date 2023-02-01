@@ -1,10 +1,10 @@
-package com.onlinestore.user;
+package com.onlinestore.payment;
 
 import org.junit.jupiter.api.Test;
 import testing.OnlineStoreTest;
 
 @OnlineStoreTest
-class UserApplicationTests {
+class PaymentServiceApplicationTests {
 
     @Test
     void contextLoads() {
