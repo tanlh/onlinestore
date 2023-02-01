@@ -1,10 +1,12 @@
 package com.onlinestore.order.saga;
 
 import com.onlinestore.order.command.commands.ApproveOrderCommand;
+import com.onlinestore.order.command.commands.RejectOrderCommand;
 import com.onlinestore.order.core.events.OrderApprovedEvent;
 import com.onlinestore.order.core.events.OrderCreatedEvent;
 import com.onlinestore.order.core.events.OrderRejectedEvent;
 import com.onlinestore.order.mapper.OrderMapper;
+import com.onlinestore.order.query.queries.FindOrderQuery;
 import com.onlinestore.shared.command.ProcessPaymentCommand;
 import com.onlinestore.shared.event.PaymentProcessedEvent;
 import com.onlinestore.shared.event.ProductReservationCancelledEvent;
@@ -21,6 +23,7 @@ import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.queryhandling.QueryGateway;
+import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.axonframework.spring.stereotype.Saga;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,6 +40,7 @@ public class OrderSaga {
     transient CommandGateway commandGateway;
     transient QueryGateway queryGateway;
     transient DeadlineManager deadlineManager;
+    transient QueryUpdateEmitter queryUpdateEmitter;
 
     @StartSaga
     @SagaEventHandler(associationProperty = "orderId")
@@ -45,7 +49,10 @@ public class OrderSaga {
 
         commandGateway.send(reserveProductCommand, (commandMessage, commandResultMessage) -> {
             if (commandResultMessage.isExceptional()) {
-                // start compensation transaction
+                commandGateway.send(RejectOrderCommand.builder()
+                    .orderId(event.getOrderId())
+                    .reason(commandResultMessage.exceptionResult().getMessage())
+                    .build());
             } else {
                 log.info("Send ReserveProductCommand success: {}", commandResultMessage.getPayload());
             }
@@ -70,7 +77,7 @@ public class OrderSaga {
 
         log.info("Successfully fetch user payment details: {}", userPaymentDetails);
 
-        deadlineManager.schedule(Duration.ofSeconds(10), "payment-process-deadline", event);
+        deadlineManager.schedule(Duration.ofMinutes(1), "payment-process-deadline", event);
 
         // testing deadline
 //        if (true) return;
@@ -113,8 +120,7 @@ public class OrderSaga {
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderApprovedEvent event) {
         log.info("Order is approved, order saga is complete for orderId: " + event.getOrderId());
-        // alternative way
-//        SagaLifecycle.end();
+        queryUpdateEmitter.emit(FindOrderQuery.class, query -> true, mapper.toOrderSummary(event));
     }
 
     @SagaEventHandler(associationProperty = "orderId")
@@ -126,6 +132,7 @@ public class OrderSaga {
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderRejectedEvent event) {
         log.info("Successfully rejected order with orderId: " + event.getOrderId());
+        queryUpdateEmitter.emit(FindOrderQuery.class, query -> true, mapper.toOrderSummary(event));
     }
 
     @DeadlineHandler(deadlineName = "payment-process-deadline")

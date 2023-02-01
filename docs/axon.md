@@ -1,6 +1,7 @@
 # Axon note
 
-## Aggregate bean injection
+## Aggregate
+### Spring bean injection
 We cannot use constructor injection for `@Aggregate` class. But, it allows to inject
 via parameter of `@CommandHandler` method.
 
@@ -30,7 +31,8 @@ public class ProductAggregate {
 }
 ```
 
-## Saga bean injection
+## Saga
+### Spring bean injection
 The same to `@Aggregate`, constructor injection doesn't work with `@Saga` class. We are allowed to use field
 and setter injection.
 
@@ -49,6 +51,16 @@ public class OrderSaga {
     
     // some code
 
+}
+```
+
+### End saga
+An alternative way to end saga is using SagaLifecycle:
+```java
+@SagaEventHandler(associationProperty = "orderId")
+public void handle(OrderApprovedEvent event) {
+    log.info("Order is approved, order saga is complete for orderId: " + event.getOrderId());
+    SagaLifecycle.end();
 }
 ```
 

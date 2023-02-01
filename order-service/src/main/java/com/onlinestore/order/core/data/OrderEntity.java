@@ -1,5 +1,6 @@
 package com.onlinestore.order.core.data;
 
+import com.onlinestore.order.core.model.OrderStatus;
 import lombok.Data;
 
 import javax.persistence.*;

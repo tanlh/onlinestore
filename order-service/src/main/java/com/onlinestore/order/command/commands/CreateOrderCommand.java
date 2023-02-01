@@ -1,6 +1,6 @@
 package com.onlinestore.order.command.commands;
 
-import com.onlinestore.order.core.data.OrderStatus;
+import com.onlinestore.order.core.model.OrderStatus;
 import lombok.Builder;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 

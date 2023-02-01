@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ValidationException;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GenericControllerAdvice {
@@ -28,6 +29,12 @@ public class GenericControllerAdvice {
         }
 
         return ResponseEntity.badRequest().body(ErrorMessage.of(HttpStatus.BAD_REQUEST.name(), errorMessage));
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public final ResponseEntity<ErrorMessage> handleNotFoundException(NoSuchElementException ex) {
+        return ResponseEntity.badRequest()
+            .body(ErrorMessage.of(HttpStatus.BAD_REQUEST.name(), ex.getMessage()));
     }
 
     @ExceptionHandler(CommandExecutionException.class)

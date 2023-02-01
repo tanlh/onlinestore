@@ -20,7 +20,9 @@ import org.springframework.beans.BeanUtils;
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
 
-@Aggregate
+import static com.onlinestore.product.config.ProductAxonConfig.PRODUCT_STD;
+
+@Aggregate(snapshotTriggerDefinition = PRODUCT_STD)
 @Data
 @NoArgsConstructor
 @Slf4j

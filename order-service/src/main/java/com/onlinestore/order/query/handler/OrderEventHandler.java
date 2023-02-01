@@ -13,6 +13,8 @@ import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.PersistenceException;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true)
@@ -26,15 +28,6 @@ public class OrderEventHandler {
     @EventHandler
     public void on(OrderCreatedEvent event) {
         orderRepository.save(mapper.toOrderEntity(event));
-
-//        var random = new Random();
-//        if (random.nextBoolean()) {
-//            if (random.nextBoolean()) {
-//                throw new IllegalStateException("Order event handler illegal error");
-//            }
-//
-//            throw new RuntimeException("Order event handler runtime error");
-//        }
     }
 
     @EventHandler
@@ -47,12 +40,9 @@ public class OrderEventHandler {
         orderRepository.updateOrderStatus(event.getOrderId(), event.getOrderStatus().name());
     }
 
-    @ExceptionHandler(resultType = IllegalArgumentException.class)
-    public void handle(IllegalArgumentException ex) {
-        log.error("Illegal error happens", ex);
-
-        // rethrow to propagate exception to let axon rollback the transaction
-        // but it's not enough, we have to register PropagatingExceptionHandler (type of ListenerInvocationErrorHandler) also
+    @ExceptionHandler(resultType = PersistenceException.class)
+    public void handle(PersistenceException ex) {
+        log.error("Error while performing data change to database", ex);
         throw ex;
     }
 

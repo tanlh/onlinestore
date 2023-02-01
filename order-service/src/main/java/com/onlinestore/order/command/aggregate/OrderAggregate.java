@@ -3,7 +3,7 @@ package com.onlinestore.order.command.aggregate;
 import com.onlinestore.order.command.commands.ApproveOrderCommand;
 import com.onlinestore.order.command.commands.CreateOrderCommand;
 import com.onlinestore.order.command.commands.RejectOrderCommand;
-import com.onlinestore.order.core.data.OrderStatus;
+import com.onlinestore.order.core.model.OrderStatus;
 import com.onlinestore.order.core.events.OrderApprovedEvent;
 import com.onlinestore.order.core.events.OrderCreatedEvent;
 import com.onlinestore.order.core.events.OrderRejectedEvent;
