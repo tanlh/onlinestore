@@ -72,6 +72,9 @@ public class OrderSaga {
 
         deadlineManager.schedule(Duration.ofSeconds(10), "payment-process-deadline", event);
 
+        // testing deadline
+//        if (true) return;
+
         var processPaymentCommand = ProcessPaymentCommand.builder()
             .paymentId(UUID.randomUUID().toString())
             .orderId(event.orderId())

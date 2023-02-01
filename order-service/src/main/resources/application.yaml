@@ -1,9 +1,6 @@
 server:
   port: ${PORT:8020}
 
-configserver:
-  import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
-
 spring:
   application:
     name: order-service
@@ -23,3 +20,5 @@ axon:
     processors:
       order:
         mode: subscribing
+  deadlinemanager:
+    enable: true

@@ -14,6 +14,7 @@ import org.axonframework.messaging.MessageDispatchInterceptor;
 import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
 import org.axonframework.spring.messaging.unitofwork.SpringTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,6 +54,7 @@ public class CommonAxonConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "axon.deadlinemanager.enable", havingValue = "true")
     public DeadlineManager deadlineManager(org.axonframework.config.Configuration configuration,
                                            SpringTransactionManager transactionManager) {
         return SimpleDeadlineManager.builder()
