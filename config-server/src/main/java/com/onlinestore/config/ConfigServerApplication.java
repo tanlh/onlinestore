@@ -1,4 +1,4 @@
-package com.onlinestore.configserver;
+package com.onlinestore.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.onlinestore.configserver;
+package com.onlinestore.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
