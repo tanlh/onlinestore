@@ -1,6 +1,7 @@
 # Basic guideline
 
-## Connect to H2 database
+## Connect to database
+### H2 database
 1. Add H2 dependency
 ```xml
 <dependency>
@@ -32,7 +33,7 @@ spring:
 ```
 Read more: https://stackoverflow.com/questions/63587966/spring-boot-h2-database-not-found-not-created-by-liquibase
 
-## Connect to MySQL database
+### MySQL database
 1. Add dependency ``mysql-connector-java``
 ```xml
 <dependency>
@@ -53,7 +54,7 @@ spring:
       ddl-auto: update
 ```
 
-## A note on hibernate dialect
+### A note on Hibernate dialect
 I tested with H2, without the below properties, the H2 database still work well
 ```yaml
 spring:
@@ -71,7 +72,87 @@ spring:
 ```
 Read more: https://vladmihalcea.com/hibernate-dialect/
 
-## Bean validation with spring boot
+## Config server
+### Setup cloud bus
+In this project, we use [RabbitMQ](https://www.rabbitmq.com/download.html) as message broker for cloud bus. I use docker to start RabbitMQ:
+```shell
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
+```
+RabbitMQ portal is on port 15672: http://localhost:15672 \
+Login username / password: guest / guest
+
+Spring cloud bus automatically configure the RabbitQM, the default config is:
+```yaml
+spring:
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+```
+
+### Refresh config
+When we change the config in config-server, these changes won't be pushed to the client applications.
+We need call the `/busrefresh` endpoint from config-server to let it push the changes to the client applications.
+```shell
+curl --location --request POST 'http://localhost:8888/actuator/busrefresh'
+```
+
+In the client applications:
+- The property bindings made with the ``@ConfigurationProperties`` and the property readings directly from the ``Environment`` interface
+are automatically refreshed.
+- The attributes bounded with ``@Value`` (from Spring) in the beans having the annotation ``@RefreshScope`` is refreshed.
+- The other property bindings won't be refreshed
+Read more: https://soshace.com/spring-cloud-config-refresh-strategies/
+
+### Encrypt/decrypt properties
+To keep credentials properties (username, password, ...) more secured in properties file, we should encrypt them instead of storing plain text \
+Here are the steps:
+
+1. Add encryption key to bootstrap.properties/.yaml
+```yaml
+# Symmetric key
+encrypt:
+  key: 9mlnaslkjzv823jkasdiofahjs91aslfasjf1j
+```
+```yaml
+# Asymmetric key
+encrypt:
+  key-store:
+    location: apikey.jks
+    alias: apikey
+    password: test123456
+```
+
+**Note:** You can use ``keytool`` to generate keystore.
+```shell
+keytool -genkeypair -alias apikey -keyalg RSA -keystore apikey.jks
+```
+
+**Note:** Since spring cloud 2020, they bootstrap is not enabled by default, we have to add ``spring-cloud-starter-bootstrap``
+to make bootstrap.properties loaded.
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+</dependency>
+```
+
+2. Make a ``POST`` request to config server to get the encrypted value
+```shell
+curl --location --request POST 'http://localhost:8888/encrypt' \
+--header 'Content-Type: text/plain' \
+--data-raw 'root'
+```
+3. Change the plain text to encrypted value with prefix ``{cipher}``
+```yaml
+token:
+  signingKey: '{cipher}9a641a553fb4fed2ac5c1eba32a04d4766d14c95dcdff470cadbb496e35ed163'
+```
+
+**Note:** With yaml file, you have to put your encrypted value in ``'{cipher}...'`` to make it work. You don't need to do it with ``.properties`` file
+
+## Bean validation
 Starting with Boot 2.3, we also need to explicitly add the ``spring-boot-starter-validation`` dependency to have bean validation ``@NotNull``, ``@NotBlank``, etc
 ```xml
 <dependency>
